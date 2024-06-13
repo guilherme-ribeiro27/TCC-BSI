@@ -1,12 +1,12 @@
-FROM node:tls
+FROM node:18
 
 WORKDIR /app
 
-COPY package.json /app
-RUN yarn install
+COPY package*.json ./
 
-COPY . /app
+RUN npm install
 
-EXPOSE 8080
+COPY . .
 
-CMD ["yarn", "start"]
+RUN npm run build
+CMD [ "npm", "run", "start:dev" ]
