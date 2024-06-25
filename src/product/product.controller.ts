@@ -31,4 +31,13 @@ export class ProductController {
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
+
+  @Get('search/:name')
+  search(@Param('name') name: string){
+    return this.productService.search(name);
+  }
+  @Get('search/redis/:name')
+  searchRedis(@Param('name') name: string){
+    return this.productService.searchRedis(name);
+  }
 }
