@@ -18,6 +18,7 @@ import { createClient } from 'redis';
 
             });
             await client.connect();
+            console.log('Redis connected');
             return client;
         }
     }], 
