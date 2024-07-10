@@ -8,6 +8,7 @@ import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Product]), RedisModule],
+  exports: [ProductService],
   controllers: [ProductController],
   providers: [ProductService],
 })

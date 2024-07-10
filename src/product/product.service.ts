@@ -19,14 +19,21 @@ export class ProductService {
 
   async create(createProductDto: CreateProductDto) {
     //create and insert on redis as a json
-    const product = await this.productRepository.save(createProductDto);
-    await this.redisRepository.json.set(`${product.id}:product`, '.',JSON.stringify(product));
+    try{
+      console.log('product', createProductDto);
+      const product = await this.productRepository.save(createProductDto);
+      await this.redisRepository.json.set(`${product.id}:product`, '.',JSON.stringify(product));
+    }
+    catch(e){
+      console.log(e);
+    }
+    
     // await this.redisRepository.setJson(`${product.id}:product`, product, 60);
-    return product;
+    return '';
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll() {
+    return await this.productRepository.find();
   }
 
   findOne(id: number) {
