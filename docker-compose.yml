@@ -1,47 +1,48 @@
 version: '3.8'
 
-services:
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     - PORT=${PORT}
-  #   volumes:
-  #     - .:/app
-  #     - .:/app/node_modules
-  #   ports:
-  #     - 3000:3000
-  #   depends_on:
-  #     - db
-  #     - redis
-  #   networks:
-  #     - tcc
+# services:
+#   # app:
+#   #   build:
+#   #     context: .
+#   #     dockerfile: Dockerfile
+#   #   environment:
+#   #     - PORT=${PORT}
+#   #   volumes:
+#   #     - .:/app
+#   #     - .:/app/node_modules
+#   #   ports:
+#   #     - 3000:3000
+#   #   depends_on:
+#   #     - db
+#   #     - redis
+#   #   networks:
+#   #     - tcc
+# version: '3.1'
 
-  db:
-    image: postgres:alpine
-    environment:
-      POSTGRES_USER: tcc
-      POSTGRES_PASSWORD: tcc
-      POSTGRES_HOST_AUTH_METHOD: trust
+services:
+  cassandra:
+    image: cassandra:latest
+    restart: unless-stopped
+    ports:
+      - 9042:9042
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-  
-  pgadmin:
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=tcc@tcc.com
-      - PGADMIN_DEFAULT_PASSWORD=tcc
-    ports:
-      - '5050:80'
-    depends_on:
-      - db
+      - ./data/cassandra:/var/lib/cassandra
 
   redis:
-    image: redis:alpine
-    command: redis-server --requirepass tcc
+    image: redis:latest
+    restart: unless-stopped
     ports:
-      - '6379:6379'
+      - 6379:6379
+    volumes:
+      - ./data/redis:/data
+
+  app-import:
+    build: .
+    depends_on:
+      - cassandra
+      - redis
+    volumes:
+      - .:/usr/src/app
+    command: >
+      bash -c "python import_cassandra.py && python import_redis.py"
+
